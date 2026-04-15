@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  node1:
+    build:
+      context: ./node_app
+      dockerfile: Dockerfile
+    container_name: kitten_node1
+    environment:
+      - NODE_ID=1
+      - NODE_COLOR=#6C5CE7
+    networks:
+      - kitten_lb_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  node2:
+    build:
+      context: ./node_app
+      dockerfile: Dockerfile
+    container_name: kitten_node2
+    environment:
+      - NODE_ID=2
+      - NODE_COLOR=#00B894
+    networks:
+      - kitten_lb_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  node3:
+    build:
+      context: ./node_app
+      dockerfile: Dockerfile
+    container_name: kitten_node3
+    environment:
+      - NODE_ID=3
+      - NODE_COLOR=#FDCB6E 
+    networks:
+      - kitten_lb_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: kitten_nginx
+    ports:
+      - "${LB_PORT:-8080}:80"
+    depends_on:
+      node1:
+        condition: service_healthy
+      node2:
+        condition: service_healthy
+      node3:
+        condition: service_healthy
+    networks:
+      - kitten_lb_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/nginx-health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+networks:
+  kitten_lb_network:
+    driver: bridge
+    name: kitten_lb_network
