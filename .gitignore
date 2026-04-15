@@ -8,3 +8,5 @@ __MACOSX/
 test.db
 htmlcov/
 .coverage
+.git
+.mypy_cache/
