@@ -1,14 +1,15 @@
-from fastapi import FastAPI, HTTPException, Depends, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlalchemy import create_engine, Column, Integer, String
-from sqlalchemy.orm import sessionmaker, declarative_base, Session
 import os
+
+from fastapi import Depends, FastAPI, Form, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
+from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy.orm import Session, declarative_base, sessionmaker
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {},
 )
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -43,7 +44,7 @@ def create_kitten(
     age: int,
     color: str,
     breed: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     kitten = Kitten(name=name, age=age, color=color, breed=breed)
     db.add(kitten)
@@ -94,7 +95,7 @@ def update_kitten(
     age: int,
     color: str,
     breed: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     k = db.get(Kitten, kitten_id)
     if not k:
@@ -130,7 +131,6 @@ def delete_kitten(kitten_id: int, db: Session = Depends(get_db)):
 @app.get("/health")
 def health():
     return {"status": "healthy", "service": "kitten-api"}
-
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -323,9 +323,23 @@ input::placeholder {
 
         <div class="actions">
             <a class="delete" href="/delete/{k.id}">Удалить</a>
-            <a class="edit edit-btn-{k.id}" href="#" onclick="editKitten({k.id}); return false;">Изменить</a>
-            <button class="save hidden save-btn-{k.id}" type="submit">Сохранить</button>
-            <button class="cancel hidden cancel-btn-{k.id}" type="button" onclick="cancelEdit({k.id})">Отмена</button>
+            <a
+                class="edit edit-btn-{k.id}"
+                href="#"
+                onclick="editKitten({k.id}); return false;"
+            >
+                Изменить
+            </a>
+            <button class="save hidden save-btn-{k.id}" type="submit">
+                Сохранить
+            </button>
+            <button
+                class="cancel hidden cancel-btn-{k.id}"
+                type="button"
+                onclick="cancelEdit({k.id})"
+            >
+                Отмена
+            </button>
         </div>
     </form>
 </div>
@@ -366,7 +380,7 @@ def add(
     age: int = Form(...),
     color: str = Form(...),
     breed: str = Form(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     kitten = Kitten(name=name, age=age, color=color, breed=breed)
     db.add(kitten)
@@ -390,7 +404,7 @@ def update_gui(
     age: int = Form(...),
     color: str = Form(...),
     breed: str = Form(...),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     k = db.get(Kitten, kitten_id)
     if not k:
