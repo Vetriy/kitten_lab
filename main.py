@@ -291,6 +291,8 @@ input::placeholder {
 <div class="card">
 
 <h1>Kitten Manager</h1>
+<h1>test</h1>
+
 
 <form class="form" action="/add" method="post">
     <input name="name" placeholder="Имя" required>
